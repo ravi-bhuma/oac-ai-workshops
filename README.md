@@ -1,2 +1,2 @@
 # oac-ai-workshops
-Repository for OAC AI Workshops
+Repository for Oracle Analytics Cloud AI Features Workshop

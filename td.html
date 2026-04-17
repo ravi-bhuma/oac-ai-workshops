@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hands-on workshop covering Oracle Analytics Cloud AI features — AI Assistant, AI Agents, AI Functions, MCP Server, and Embedding. Prepared for TD Bank.">
+    <meta property="og:title" content="Oracle Analytics Cloud · AI Features — Hands-On Workshop">
+    <meta property="og:description" content="Explore 6 AI capabilities in Oracle Analytics Cloud: Homepage & Workbook AI Assistants, AI Agents, AI Functions, MCP Server, and Embedded AI.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ravi-bhuma.github.io/oac-ai-workshops/td.html">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Oracle Analytics Cloud · AI Features — Hands-On Workshop | TD Bank">
+    <meta name="twitter:description" content="Hands-on guide to Oracle Analytics Cloud AI — AI Assistant, AI Agents, AI Functions, MCP Server & more.">
+    <title>Oracle Analytics Cloud · AI Features — Hands-On Workshop | TD Bank</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --green:#54B948;--green-dark:#3F9A2F;--green-darker:#003F2D;--blue:#2F6FA7;
+            --text:#1F1F1F;--muted:#666;--light:#F7F7F7;--lighter:#FAFAFA;
+            --border:#E5E5E5;--white:#FFF;--shadow:0 1px 3px rgba(0,0,0,.08);
+            --box-shadow-td:rgba(0,0,0,0.5) 0px 1px 2px 0px;
+        }
+        [data-theme="dark"]{
+            --text:#E8E8E8;--muted:#A0A0A0;--light:#1E1E1E;--lighter:#161616;
+            --border:#2A2A2A;--white:#111111;--shadow:0 1px 3px rgba(0,0,0,.3);
+            --box-shadow-td:rgba(0,0,0,0.6) 0px 2px 4px 0px;
+        }
+        html{scroll-behavior:smooth}
+        body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--text);background:var(--white);line-height:1.7;font-size:15px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+        /* ── PROGRESS BAR ── */
+        #progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--green),#7BD06F,var(--green));z-index:9999;transition:width .2s ease-out;border-radius:0 2px 2px 0}
+
+        /* ── TOP BAR (TD STYLE) ── */
+        .topbar{position:sticky;top:0;z-index:1000;background:rgb(84,185,72);box-shadow:0 2px 12px rgba(0,0,0,.15);backdrop-filter:blur(8px)}
+        .topbar-row1{max-width:1200px;margin:0 auto;display:flex;align-items:center;padding:14px 32px 8px;gap:18px}
+        .topbar-logo{height:42px;width:auto;flex-shrink:0;display:block;border-radius:3px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+        .footer-logo{height:40px;width:auto;display:block;border-radius:3px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+        .topbar-divider{width:1px;height:26px;background:rgba(255,255,255,.3);flex-shrink:0}
+        .topbar-title{font-size:15px;font-weight:600;color:var(--white);white-space:nowrap;flex-shrink:0;letter-spacing:0.4px;opacity:.95}
+        .topbar-row2{max-width:1200px;margin:0 auto;padding:0 32px 12px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+        .topbar-row2::-webkit-scrollbar{display:none}
+        .topbar-nav{display:flex;gap:2px;align-items:center}
+        .topbar-nav a{padding:6px 14px;font-size:12.5px;font-weight:500;color:rgba(255,255,255,.9);text-decoration:none;border-radius:20px;white-space:nowrap;transition:all .2s ease}
+        .topbar-nav a:hover{background:rgba(255,255,255,.15);color:#fff}
+        .topbar-nav a.active{background:var(--white);color:var(--green-darker);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.1)}
+
+        /* ── MAIN ── */
+        .main{max-width:920px;margin:0 auto;padding:0 32px}
+
+        /* ── COVER ── */
+        .cover{padding:64px 0 52px;position:relative}
+        .cover::before{content:'';position:absolute;top:0;left:-32px;right:-32px;height:4px;background:linear-gradient(90deg,var(--green) 0%,rgba(84,185,72,.3) 60%,transparent 100%)}
+        .cover-badge{display:inline-block;font-size:11px;font-weight:700;color:var(--white);background:var(--green);letter-spacing:1.2px;text-transform:uppercase;padding:7px 16px;border-radius:20px;margin-bottom:24px;box-shadow:0 2px 8px rgba(84,185,72,.25)}
+        .cover h1{font-size:42px;font-weight:800;color:var(--text);line-height:1.1;margin-bottom:6px;letter-spacing:-0.8px}
+        .cover h1 span{color:var(--green-darker)}
+        .cover .cover-h1-sub{font-size:32px;font-weight:700;color:var(--muted);line-height:1.2;margin-bottom:20px;letter-spacing:-0.4px}
+        .cover .cover-h1-sub span{color:var(--green-darker);font-weight:800}
+        .cover-sub{font-size:17px;color:var(--muted);margin-bottom:20px;line-height:1.5;font-weight:400}
+        .cover-intro{font-size:15px;color:#444;line-height:1.8;margin-bottom:36px;max-width:740px}
+        .cover-meta{display:flex;gap:16px;flex-wrap:wrap;padding-top:36px;margin-top:36px;border-top:1px solid var(--border)}
+        .cover-meta-card{flex:1;min-width:240px;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px 26px;position:relative;overflow:hidden;transition:all .3s ease}
+        .cover-meta-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--green-darker))}
+        .cover-meta-card:hover{box-shadow:0 8px 28px rgba(84,185,72,.1);border-color:rgba(84,185,72,.2);transform:translateY(-2px)}
+        .cover-meta-label{font-size:10px;font-weight:700;color:var(--green-darker);letter-spacing:1.8px;text-transform:uppercase;margin-bottom:16px}
+        .cover-meta-card p{font-size:14px;color:var(--text);line-height:1.7}
+        .cover-meta-card .name{font-weight:600;color:var(--text)}
+        .cover-meta-card .role{color:var(--muted);font-size:13px;margin-top:1px}
+        .presenter-row{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+        .presenter-row:last-child{margin-bottom:0}
+        .presenter-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-darker));color:var(--white);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;letter-spacing:0.5px;box-shadow:0 2px 6px rgba(84,185,72,.25)}
+        .presenter-info .name{display:block;font-weight:600;font-size:14px;color:var(--text)}
+        .presenter-info .role{display:block;color:var(--muted);font-size:12px;margin-top:2px;line-height:1.4}
+        .cover-date-value{font-size:24px;font-weight:800;color:var(--text);letter-spacing:-0.3px;margin-bottom:2px}
+        .cover-date-day{font-size:14px;color:var(--muted);font-weight:500}
+        .cover-link{display:inline-flex;align-items:center;gap:8px;margin-top:32px;font-size:14px;font-weight:600;color:var(--white);text-decoration:none;padding:13px 24px;background:linear-gradient(135deg,var(--green),var(--green-darker));border-radius:10px;transition:all .3s ease;box-shadow:0 4px 14px rgba(84,185,72,.3)}
+        .cover-link:hover{box-shadow:0 6px 20px rgba(84,185,72,.4);transform:translateY(-2px)}
+
+        /* ── SECTION ── */
+        .section{padding:56px 0;border-top:1px solid var(--border);scroll-margin-top:100px}
+        .section:first-of-type{border-top:none}
+        .cover{scroll-margin-top:100px}
+        .section-header{display:flex;align-items:center;gap:16px;margin-bottom:32px;flex-wrap:wrap}
+        .section-num{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;background:linear-gradient(135deg,var(--green),var(--green-darker));color:var(--white);font-size:16px;font-weight:800;border-radius:50%;flex-shrink:0;box-shadow:0 2px 8px rgba(84,185,72,.25)}
+        .section-title{font-size:23px;font-weight:700;color:var(--text);letter-spacing:-0.4px}
+        .section-time{font-size:11px;font-weight:600;color:var(--muted);background:var(--light);padding:6px 14px;border-radius:20px;margin-left:auto;white-space:nowrap;letter-spacing:0.3px}
+        .section h3{font-size:17px;font-weight:700;color:var(--text);margin:32px 0 16px;letter-spacing:-0.2px}
+        .section p,.section li{font-size:15px;line-height:1.75;color:var(--text)}
+        .section ul,.section ol{padding-left:24px;margin:12px 0 18px}
+        .section li{margin-bottom:8px}
+        .section li strong{color:var(--text);font-weight:600}
+
+        /* ── TABLE ── */
+        .tbl{width:100%;border-collapse:collapse;margin:20px 0 28px;font-size:14px;border-radius:12px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+        .tbl th{text-align:left;padding:13px 18px;background:var(--green-darker);color:var(--white);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.8px}
+        .tbl td{padding:13px 18px;border-bottom:1px solid var(--border)}
+        .tbl tbody tr:nth-child(even) td{background:rgba(250,250,250,.6)}
+        .tbl tr:hover td{background:rgba(84,185,72,.05)}
+        .tbl .num{font-weight:700;color:var(--green-darker);width:45px}
+
+        /* ── CODE ── */
+        .code{background:#1a1a2e;border-left:4px solid var(--green);padding:16px 18px;font-family:'SF Mono','Fira Code',Consolas,monospace;font-size:13px;line-height:1.65;border-radius:6px;margin:14px 0 18px;overflow-x:auto;color:#E0E0E0;box-shadow:0 2px 6px rgba(0,0,0,.08);white-space:pre}
+        .code .label{color:#7BD06F;font-weight:700}
+        .code .value{color:#E0E0E0}
+        .code .comment{color:#6B7B8D;font-style:italic}
+
+        /* ── CALLOUT ── */
+        .callout{padding:16px 20px;border-radius:8px;margin:16px 0 20px;font-size:14px;line-height:1.7;border-left:3px solid var(--blue)}
+        .callout.info{background:rgba(47,111,167,.05);border-left-color:var(--blue)}
+        .callout.warn{background:rgba(84,185,72,.05);border-left-color:var(--green)}
+        .callout.tip{background:rgba(40,167,69,.05);border-left-color:#28a745}
+        .callout strong{font-weight:700;color:var(--text)}
+
+        /* ── CARDS GRID ── */
+        .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px;margin:18px 0 28px}
+        .card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:24px;transition:all .3s ease;position:relative;overflow:hidden}
+        .card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--green),var(--green-darker));transform:scaleX(0);transform-origin:left;transition:transform .3s ease}
+        .card:hover{border-color:rgba(84,185,72,.25);box-shadow:0 8px 24px rgba(84,185,72,.1);transform:translateY(-2px)}.card:hover::before{transform:scaleX(1)}
+        .card-icon{font-size:28px;margin-bottom:12px;display:block}
+        .card h4{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);letter-spacing:-0.2px}
+        .card p{font-size:13.5px;color:var(--muted);line-height:1.6}
+
+        /* ── FRAMEWORK GRID (R.T.C.C.O.E) ── */
+        .fw-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0 28px}
+        .fw-card{background:linear-gradient(135deg,rgba(84,185,72,.04) 0%,rgba(47,111,167,.03) 100%);border-radius:14px;padding:20px;border-left:4px solid var(--green);transition:all .3s ease}
+        .fw-card:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+        .fw-card .letter{font-size:32px;font-weight:900;color:var(--green-darker);line-height:1;margin-bottom:6px}
+        .fw-card .label{font-size:13px;font-weight:700;color:var(--text);margin:6px 0 6px;letter-spacing:-0.1px}
+        .fw-card .desc{font-size:12px;color:var(--muted);line-height:1.6}
+
+        /* ── EXPAND/DETAILS ── */
+        details{margin:14px 0;border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all .3s ease}
+        details[open]{border-color:rgba(84,185,72,.25);box-shadow:0 4px 16px rgba(84,185,72,.08)}
+        summary{padding:15px 20px;font-size:14px;font-weight:600;cursor:pointer;background:var(--lighter);transition:all .2s ease;list-style:none;display:flex;align-items:center;gap:10px;user-select:none}
+        summary::-webkit-details-marker{display:none}
+        summary::before{content:'';display:inline-block;width:0;height:0;border-left:6px solid var(--green);border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .25s ease-out;flex-shrink:0}
+        details[open] summary::before{transform:rotate(90deg)}
+        summary:hover{background:rgba(84,185,72,.05)}
+        details .expand-content{padding:22px;font-size:14px;line-height:1.75;background:var(--lighter)}
+        details .expand-content ol,details .expand-content ul{padding-left:20px;margin:10px 0}
+        details .expand-content li{margin-bottom:8px;font-size:14px;line-height:1.7}
+
+        /* ── REF LINK ── */
+        .ref{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--blue);text-decoration:none;padding:0;background:none;border-radius:0;margin:6px 8px 6px 0;transition:all .2s;border-bottom:1px solid var(--blue)}
+        .ref:hover{color:#1e5a96;border-bottom-color:#1e5a96;padding-bottom:1px}
+
+        /* ── QA PROMPT ── */
+        .qa-prompt{background:var(--lighter);border-radius:8px;padding:16px 18px;margin-top:24px;font-size:14px;border-left:3px solid var(--green);line-height:1.7}
+        .qa-prompt strong{color:var(--green-darker);font-weight:700}
+
+        /* ── CHECKLIST ── */
+        .checklist{list-style:none;padding:0;margin:14px 0}
+        .checklist li{padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;display:flex;align-items:center;gap:12px;line-height:1.6}
+        .checklist li::before{content:'';width:20px;height:20px;border:2px solid var(--border);border-radius:4px;flex-shrink:0;background:var(--white);transition:all .25s}
+        .checklist li:hover::before{border-color:var(--green)}
+
+        /* ── TAKEAWAY CARDS ── */
+        .takeaways{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin:18px 0 28px}
+        .takeaway{padding:20px;background:var(--lighter);border-radius:12px;border-left:4px solid var(--green);transition:all .3s ease}
+        .takeaway:hover{box-shadow:0 6px 20px rgba(0,0,0,.06);transform:translateY(-2px)}
+        .takeaway h4{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text);letter-spacing:-0.2px}
+        .takeaway p{font-size:13px;color:var(--muted);line-height:1.6}
+
+        /* ── FOOTER ── */
+        .footer{background:linear-gradient(135deg,var(--green) 0%,var(--green-darker) 100%);color:var(--white);padding:48px 0;margin-top:40px;border-top:none}
+        .footer-inner{max-width:1200px;margin:0 auto;padding:0 32px;display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap}
+        .footer-left p{font-size:14px;line-height:1.75;color:rgba(255,255,255,.95)}
+        .footer-left .name{font-weight:600;color:var(--white)}
+        .footer-left .role{color:rgba(255,255,255,.8);font-size:13px;margin-top:2px}
+        .footer-left .cover-meta-label{color:rgba(255,255,255,.95);text-transform:uppercase;font-size:11px;letter-spacing:1.5px;margin-bottom:10px}
+        .footer-right{text-align:right}
+        .footer-right img{height:32px;margin-bottom:10px;width:auto;background:#fff;padding:4px 8px;border-radius:4px}
+        .footer-right p{font-size:13px;color:rgba(255,255,255,.9);line-height:1.6}
+
+        /* ── PRINT ── */
+        @media print{
+            .topbar,#progress{display:none!important}
+            .section{page-break-inside:avoid}
+            body{font-size:12px}
+            .cover h1{font-size:28px}
+            .footer{background:transparent;color:var(--text);border-top:1px solid var(--border)}
+            .footer-left .cover-meta-label{color:var(--green-darker)}
+            .footer-left p,.footer-right p{color:var(--text)}
+        }
+
+        @media(max-width:768px){
+            .topbar-row1{padding:10px 16px 6px}
+            .topbar-row2{padding:0 16px 8px}
+            .fw-grid{grid-template-columns:1fr}
+            .section-header{flex-direction:column;align-items:flex-start}
+            .section-time{margin-left:0;margin-top:8px}
+            .footer-inner{flex-direction:column;align-items:flex-start}
+            .footer-right{text-align:left}
+            .cover-meta{flex-direction:column}
+            .cover-meta-card{min-width:unset}
+        }
+
+        /* ── FADE-IN ON SCROLL ── */
+        .fade-in{opacity:0;transform:translateY(24px);transition:opacity .6s ease-out,transform .6s ease-out}
+        .fade-in.visible{opacity:1;transform:translateY(0)}
+        .fade-in.delay-1{transition-delay:.1s}
+        .fade-in.delay-2{transition-delay:.2s}
+        .fade-in.delay-3{transition-delay:.3s}
+        @media(prefers-reduced-motion:reduce){.fade-in{opacity:1;transform:none;transition:none}}
+
+        /* ── PRINT BUTTON ── */
+        .cover-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:32px}
+        .cover-btn-secondary{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--green-darker);text-decoration:none;padding:13px 24px;background:var(--white);border:2px solid var(--green);border-radius:10px;transition:all .3s ease;cursor:pointer;font-family:inherit}
+        .cover-btn-secondary:hover{background:rgba(84,185,72,.06);box-shadow:0 4px 14px rgba(84,185,72,.15);transform:translateY(-2px)}
+        .cover-btn-secondary svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        @media print{.cover-actions .cover-btn-secondary{display:none!important}}
+
+        /* ── QR CODE ── */
+        .qr-container{text-align:center;padding:8px 0 0}
+        .qr-container canvas{border-radius:8px}
+        .qr-label{font-size:10px;color:var(--muted);margin-top:6px;letter-spacing:0.5px;font-weight:500}
+
+        /* ── COPY BUTTON ── */
+        .code-wrapper{position:relative}
+        .copy-btn{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);color:#ccc;border:1px solid rgba(255,255,255,.15);padding:4px 10px;font-size:11px;font-family:'Inter',sans-serif;border-radius:5px;cursor:pointer;transition:all .2s;opacity:0}
+        .code-wrapper:hover .copy-btn{opacity:1}
+        .copy-btn:hover{background:rgba(255,255,255,.2);color:#fff}
+        .copy-btn.copied{background:rgba(40,167,69,.25);color:#28a745;border-color:rgba(40,167,69,.3)}
+
+        /* ── BACK TO TOP ── */
+        .back-top{position:fixed;bottom:28px;right:28px;width:44px;height:44px;background:var(--green);color:var(--white);border:none;border-radius:50%;font-size:20px;cursor:pointer;box-shadow:0 3px 12px rgba(84,185,72,.35);opacity:0;pointer-events:none;transition:all .3s;z-index:999;display:flex;align-items:center;justify-content:center}
+        .back-top.visible{opacity:1;pointer-events:auto}
+        .back-top:hover{background:var(--green-darker);transform:translateY(-2px);box-shadow:0 5px 16px rgba(84,185,72,.45)}
+        @media print{.back-top{display:none!important}}
+
+        /* ── DARK MODE TOGGLE ── */
+        .theme-toggle{background:none;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.95);cursor:pointer;padding:5px 10px;border-radius:20px;font-size:13px;display:flex;align-items:center;gap:5px;transition:all .2s;margin-left:auto;flex-shrink:0;font-family:inherit}
+        .theme-toggle:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.4)}
+        .theme-toggle .icon{font-size:14px;line-height:1}
+
+        /* ── DARK MODE OVERRIDES ── */
+        [data-theme="dark"] body{background:#111111;color:var(--text)}
+        [data-theme="dark"] .cover::before{background:linear-gradient(90deg,var(--green) 0%,rgba(84,185,72,.2) 60%,transparent 100%)}
+        [data-theme="dark"] .cover-intro{color:var(--muted)}
+        [data-theme="dark"] .cover-meta-card{background:#1A1A1A;border-color:var(--border)}
+        [data-theme="dark"] .cover-meta-card::before{opacity:.8}
+        [data-theme="dark"] .cover-meta-card:hover{box-shadow:0 8px 28px rgba(0,0,0,.3)}
+        [data-theme="dark"] .tbl td{border-bottom-color:var(--border)}
+        [data-theme="dark"] .tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+        [data-theme="dark"] .tbl tr:hover td{background:rgba(84,185,72,.08)}
+        [data-theme="dark"] .card{background:#1A1A1A;border-color:var(--border)}
+        [data-theme="dark"] .card:hover{border-color:rgba(84,185,72,.35);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+        [data-theme="dark"] .fw-card{background:linear-gradient(135deg,rgba(84,185,72,.08) 0%,rgba(47,111,167,.06) 100%)}
+        [data-theme="dark"] details{border-color:var(--border)}
+        [data-theme="dark"] summary{background:#1A1A1A}
+        [data-theme="dark"] summary:hover{background:rgba(84,185,72,.1)}
+        [data-theme="dark"] details .expand-content{background:#161616}
+        [data-theme="dark"] .code{background:#0D0D1A;border-left-color:var(--green)}
+        [data-theme="dark"] .callout.info{background:rgba(47,111,167,.08)}
+        [data-theme="dark"] .callout.warn{background:rgba(84,185,72,.1)}
+        [data-theme="dark"] .callout.tip{background:rgba(40,167,69,.08)}
+        [data-theme="dark"] .qa-prompt{background:#1A1A1A}
+        [data-theme="dark"] .takeaway{background:#1A1A1A}
+        [data-theme="dark"] .checklist li{border-bottom-color:var(--border)}
+        [data-theme="dark"] .checklist li::before{border-color:var(--border);background:#1A1A1A}
+        [data-theme="dark"] .ref{color:#5DA4E8;border-bottom-color:#5DA4E8}
+        [data-theme="dark"] .cover-btn-secondary{color:var(--green);background:#1A1A1A;border-color:var(--green)}
+        [data-theme="dark"] .cover-btn-secondary:hover{background:rgba(84,185,72,.1)}
+        [data-theme="dark"] .presenter-avatar{box-shadow:0 2px 6px rgba(0,0,0,.4)}
+        @media print{[data-theme="dark"] body{background:#fff;color:#1F1F1F}}
+    </style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div id="progress" style="width:0%"></div>
+
+<!-- Back to Top Button -->
+<button class="back-top" id="backTop" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})">&#8593;</button>
+
+<!-- Top Bar (TD Style) -->
+<header class="topbar">
+    <div class="topbar-row1">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Toronto-Dominion_Bank_logo.svg" alt="TD Bank" class="topbar-logo">
+        <div class="topbar-divider"></div>
+        <span class="topbar-title">Oracle Analytics Cloud · AI Features — Hands-On Workshop</span>
+        <button class="theme-toggle" id="themeToggle" title="Toggle dark mode"><span class="icon" id="themeIcon">☀️</span></button>
+    </div>
+    <div class="topbar-row2">
+        <nav class="topbar-nav" id="nav">
+            <a href="#cover" class="active">Overview</a>
+            <a href="#agenda">Agenda</a>
+            <a href="#m0">Setup</a>
+            <a href="#m1">Dataset Prep</a>
+            <a href="#m2">Homepage AI</a>
+            <a href="#m3">Workbook AI</a>
+            <a href="#m4">AI Agents</a>
+            <a href="#m5">AI Functions</a>
+            <a href="#m6">MCP Server</a>
+            <a href="#m7">Embedding</a>
+            <a href="#wrap">Wrap-Up</a>
+        </nav>
+    </div>
+</header>
+
+<div class="main">
+
+    <!-- ════════ COVER ════════ -->
+    <div class="cover" id="cover">
+        <div class="cover-badge">Prepared for TD Bank</div>
+        <h1>Oracle Analytics Cloud</h1>
+        <div class="cover-h1-sub">AI Features — <span>Hands-On Workshop</span></div>
+        <p class="cover-sub">Explore, Build, and Deploy AI-Powered Analytics</p>
+        <p class="cover-intro">
+            Oracle Analytics Cloud (OAC) now includes a powerful suite of AI capabilities — from conversational assistants that let anyone ask questions in plain English, to domain-specific AI Agents that understand your business rules, to AI Functions that analyze free-text data at scale, and an MCP Server that connects OAC to external AI tools like Claude Desktop. This workshop walks you through all six features hands-on, so you leave ready to deploy AI-powered analytics across your organization.
+        </p>
+
+        <div class="cover-meta fade-in">
+            <div class="cover-meta-card" style="flex:1.2;min-width:320px">
+                <div class="cover-meta-label">Presenters</div>
+                <div class="presenter-row">
+                    <div class="presenter-avatar">RB</div>
+                    <div class="presenter-info"><span class="name">Ravi Bhuma</span><span class="role">Principal Solutions Architect · Oracle Analytics, CEAL Team</span></div>
+                </div>
+                <div class="presenter-row">
+                    <div class="presenter-avatar">MS</div>
+                    <div class="presenter-info"><span class="name">Manpreet Shahi</span><span class="role">Senior Director · Oracle Analytics, CEAL Team</span></div>
+                </div>
+                <div class="presenter-row">
+                    <div class="presenter-avatar">BG</div>
+                    <div class="presenter-info"><span class="name">Bala Guddeti</span><span class="role">Principal Analytics Cloud Solution Technologist, Cloud Engineering</span></div>
+                </div>
+            </div>
+            <div class="cover-meta-card" style="flex:0.6;min-width:200px">
+                <div class="cover-meta-label">Date, Time & Location</div>
+                <div class="cover-date-value">April 16, 2026</div>
+                <div class="cover-date-day">Thursday · 10:00 AM – 1:00 PM</div>
+                <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+                    <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:2px">TD Bank Office</div>
+                    <div class="cover-date-day">TD 79 Wellington</div>
+                    <a href="https://maps.google.com/?q=TD+79+Wellington" target="_blank" style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:12px;font-weight:600;color:var(--green-darker);text-decoration:none;border-bottom:1px solid var(--green-darker)">View Map &rarr;</a>
+                </div>
+            </div>
+            <div class="cover-meta-card" style="flex:0 0 auto;min-width:140px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <div class="cover-meta-label" style="text-align:center">Scan to Open</div>
+                <div class="qr-container"><canvas id="qrCanvas"></canvas>
+                <div class="qr-label">Open on mobile</div></div>
+            </div>
+        </div>
+        <div class="cover-actions fade-in">
+            <a href="https://ravi-bhuma.github.io/oac-ai-workshops/td.html" target="_blank" class="cover-link" style="margin-top:0">Resource Hub &rarr;</a>
+            <button class="cover-btn-secondary" onclick="window.print()"><svg viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Save as PDF</button>
+        </div>
+    </div>
+
+    <!-- ════════ AGENDA ════════ -->
+    <div class="section fade-in" id="agenda">
+        <div class="section-header">
+            <div class="section-title">Workshop Agenda</div>
+        </div>
+        <table class="tbl">
+            <thead>
+                <tr><th style="width:40px">#</th><th>Module</th><th style="width:130px">Duration</th></tr>
+            </thead>
+            <tbody>
+                <tr><td class="num">0</td><td>Preparation & Setup</td><td>15 min</td></tr>
+                <tr><td class="num">1</td><td>Dataset Preparation — Indexing & Synonyms</td><td>10 + 5 min Q&A</td></tr>
+                <tr><td class="num">2</td><td>Homepage AI Assistant</td><td>10 + 5 min Q&A</td></tr>
+                <tr><td class="num">3</td><td>Workbook AI Assistant</td><td>20 + 5 min Q&A</td></tr>
+                <tr><td class="num">4</td><td>AI Agents</td><td>30 + 5 min Q&A</td></tr>
+                <tr><td class="num">5</td><td>AI Functions</td><td>20 + 5 min Q&A</td></tr>
+                <tr><td class="num">6</td><td>OAC MCP Server</td><td>20 + 5 min Q&A</td></tr>
+                <tr><td class="num">7</td><td>Embedding AI Assistant</td><td>10 + 5 min Q&A</td></tr>
+                <tr style="background:var(--light)"><td class="num">—</td><td><strong>Q&A, Discussion & Wrap-Up</strong></td><td><strong>10 min</strong></td></tr>
+            </tbody>
+            <tfoot>
+                <tr style="background:linear-gradient(135deg,var(--green),var(--green-darker))"><td colspan="2" style="color:var(--white);font-weight:700;font-size:13px;letter-spacing:0.3px;padding:14px 18px">Total Workshop Duration</td><td style="color:var(--white);font-weight:800;font-size:15px;padding:14px 18px">3 Hours</td></tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <!-- ════════ MODULE 0 ════════ -->
+    <div class="section fade-in" id="m0">
+        <div class="section-header">
+            <div class="section-num">0</div>
+            <div class="section-title">Preparation & Setup</div>
+            <div class="section-time">15 min</div>
+        </div>
+
+        <h3>6 AI Features You'll Explore</h3>
+        <div class="cards">
+            <div class="card"><div class="card-icon">🏠</div><h4>Homepage AI Assistant</h4><p>Generate dashboards from prompts on the Home page</p></div>
+            <div class="card"><div class="card-icon">📊</div><h4>Workbook AI Assistant</h4><p>In-app assistant for building and refining visualizations</p></div>
+            <div class="card"><div class="card-icon">🤖</div><h4>AI Agents</h4><p>Domain-specific experts with custom instructions and RAG</p></div>
+            <div class="card"><div class="card-icon">⚡</div><h4>AI Functions</h4><p>AI_FILTER, AI_GENERATE, AI_AGG for text analysis</p></div>
+            <div class="card"><div class="card-icon">🔌</div><h4>MCP Server</h4><p>Connect OAC to Claude Desktop, Cline, n8n, LangChain</p></div>
+            <div class="card"><div class="card-icon">🧩</div><h4>Embedded AI Assistant</h4><p>Embed analytics in custom apps via &lt;oa-assistant&gt;</p></div>
+        </div>
+
+        <h3>Prerequisites</h3>
+        <ul class="checklist">
+            <li>OAC instance with Generative AI enabled (Console &rarr; Generative AI)</li>
+            <li>Author permissions — BI Content Creator + Create/Edit AI Agents</li>
+            <li>Sample dataset uploaded and ready (e.g., SOL.xlsx)</li>
+            <li>Chrome browser recommended</li>
+            <li>Node.js v18+ installed (for MCP Server module)</li>
+        </ul>
+    </div>
+
+    <!-- ════════ MODULE 1 ════════ -->
+    <div class="section fade-in" id="m1">
+        <div class="section-header">
+            <div class="section-num">1</div>
+            <div class="section-title">Dataset Preparation</div>
+            <div class="section-time">10 + 5 Q&A</div>
+        </div>
+
+        <p>The AI Assistant and AI Agents rely on indexed metadata to understand your data. Without proper indexing, the AI doesn't know which columns exist, what values they contain, or how users refer to them. Think of it as teaching the AI your data's vocabulary.</p>
+
+        <details>
+            <summary>Hands-On Steps</summary>
+            <div class="expand-content">
+                <ol>
+                    <li>Navigate to <strong>Datasets</strong> &rarr; right-click your dataset &rarr; <strong>Inspect</strong></li>
+                    <li>Click the <strong>Search</strong> tab</li>
+                    <li>Under "Index Dataset For", select <strong>"Assistant"</strong></li>
+                    <li>For each column, choose Index Type:
+                        <ul>
+                            <li><strong>Name & Values</strong> — for categorical columns users will filter on (Country, Product Category, City)</li>
+                            <li><strong>Name only</strong> — for measures and high-cardinality fields (Revenue, Profit, Order ID)</li>
+                        </ul>
+                    </li>
+                    <li>Add <strong>Synonyms</strong> for key fields:
+                        <div class="code"><span class="label">Revenue</span>          → "sales", "income", "turnover"
+<span class="label">Customer Segment</span> → "customer type", "buyer category"
+<span class="label">Region</span>           → "territory", "area"</div>
+                    </li>
+                    <li>Click <strong>Save</strong> &rarr; <strong>Run Now</strong></li>
+                    <li>Check indexing status until <strong>"Success"</strong></li>
+                </ol>
+            </div>
+        </details>
+
+        <div class="callout info">
+            <strong>Best Practices:</strong> Use descriptive column names (not "Ename" → "Employee Name"). Only index columns users will ask about. Exclude technical fields (IDs, keys). Disambiguate similar date columns. Replace null values with "Unknown". Avoid special characters in attributes.
+        </div>
+
+        <div class="qa-prompt"><strong>Discussion:</strong> What synonyms would you need for your organization's data?</div>
+    </div>
+
+    <!-- ════════ MODULE 2 ════════ -->
+    <div class="section fade-in" id="m2">
+        <div class="section-header">
+            <div class="section-num">2</div>
+            <div class="section-title">Homepage AI Assistant</div>
+            <div class="section-time">10 + 5 Q&A</div>
+        </div>
+
+        <p>The Homepage AI Assistant is the front door to analytics. Users start with intent, not dashboards — asking questions or requesting complete workbooks directly from the OAC Home page.</p>
+
+        <h3>Key Capabilities</h3>
+        <ul>
+            <li><strong>Instant workbook creation</strong> — generate complete dashboards from prompts like "Build a profitability dashboard from Sample Sales"</li>
+            <li><strong>Context-aware dialogue</strong> — follow-up questions retain intent and context</li>
+            <li><strong>Smart search</strong> — combines catalog discovery with semantic understanding</li>
+        </ul>
+
+        <details>
+            <summary>Live Demo Walkthrough</summary>
+            <div class="expand-content">
+                <ol>
+                    <li>From OAC Home page, locate the search/assistant bar</li>
+                    <li>Type: <em>"Create a sales performance dashboard showing revenue by region and product category"</em></li>
+                    <li>Watch the AI generate a complete workbook with visualizations</li>
+                    <li>Ask follow-up: <em>"Add a trend line for the last 4 quarters"</em></li>
+                    <li>Save the generated workbook</li>
+                </ol>
+            </div>
+        </details>
+
+        <a href="https://blogs.oracle.com/analytics/the-oracle-analytics-cloud-ai-ecosystem-shaping-the-future-of-enterprise-analytics" target="_blank" class="ref">📘 The OAC AI Ecosystem</a>
+
+        <div class="qa-prompt"><strong>Discussion:</strong> What dashboards would your team generate from a single prompt?</div>
+    </div>
+
+    <!-- ════════ MODULE 3 ════════ -->
+    <div class="section fade-in" id="m3">
+        <div class="section-header">
+            <div class="section-num">3</div>
+            <div class="section-title">Workbook AI Assistant</div>
+            <div class="section-time">20 + 5 Q&A</div>
+        </div>
+
+        <p>The Workbook AI Assistant lives inside the workbook authoring experience, helping users create and refine visualizations through natural language conversation.</p>
+
+        <details>
+            <summary>How It Works Under the Hood</summary>
+            <div class="expand-content">
+                <ol>
+                    <li><strong>User question received</strong> — OAC captures the natural language query</li>
+                    <li><strong>Dataset identification</strong> — matches indexed metadata</li>
+                    <li><strong>Prompt construction</strong> — builds prompt with metadata, columns, synonyms, and question</li>
+                    <li><strong>LLM processing</strong> — translates question into a structured query</li>
+                    <li><strong>Query verification</strong> — validates against data model and executes</li>
+                    <li><strong>Visualization generation</strong> — produces the appropriate chart</li>
+                </ol>
+            </div>
+        </details>
+
+        <details>
+            <summary>Hands-On Lab (15 min)</summary>
+            <div class="expand-content">
+                <ol>
+                    <li>Open or create a workbook on your indexed dataset</li>
+                    <li>Click the <strong>AI Assistant</strong> in the top bar</li>
+                    <li>Ask sample questions one by one:
+                        <ul>
+                            <li><em>"What are the top customer segments by sales?"</em></li>
+                            <li><em>"How does order priority affect shipping costs?"</em></li>
+                            <li><em>"Show revenue by product category and region"</em></li>
+                            <li><em>"Compare Q3 vs Q4 sales by territory"</em></li>
+                        </ul>
+                    </li>
+                    <li><strong>Interact with results:</strong> Change chart type, add/remove fields, ask iterative follow-ups</li>
+                    <li>Click <strong>+</strong> to add best visualizations to your workbook canvas</li>
+                </ol>
+            </div>
+        </details>
+
+        <details>
+            <summary>Enable for Consumer Users</summary>
+            <div class="expand-content">
+                <ol>
+                    <li>Click the <strong>Present</strong> tab in your workbook</li>
+                    <li>Under <strong>Insights Panel</strong>, toggle <strong>Workbook Assistant → On</strong></li>
+                    <li>Consumer users can now use the Assistant when viewing this workbook</li>
+                </ol>
+            </div>
+        </details>
+
+        <div style="margin-top:14px">
+            <a href="https://blogs.oracle.com/analytics/oracle-analytics-ai-assistant-getting-started-in-3-steps" target="_blank" class="ref">📘 Getting Started in 3 Steps</a>
+            <a href="https://blogs.oracle.com/analytics/from-questions-to-insights-with-oracle-analytics-ai-assistant" target="_blank" class="ref">📘 Unlock Full Power of AI Assistant</a>
+        </div>
+
+        <div class="qa-prompt"><strong>Discussion:</strong> What questions do your business users ask most frequently?</div>
+    </div>
+
+    <!-- ════════ MODULE 4 ════════ -->
+    <div class="section fade-in" id="m4">
+        <div class="section-header">
+            <div class="section-num">4</div>
+            <div class="section-title">AI Agents</div>
+            <div class="section-time">30 + 5 Q&A</div>
+        </div>
+
+        <p>AI Agents are domain-specific experts that combine enterprise data with custom instructions and knowledge documents using RAG. Without proper engineering, agents behave like generic LLMs — they don't know your fiscal calendar, your KPI formulas, or what "important orders" means.</p>
+
+        <h3>The 4 Agent Components</h3>
+        <div class="cards" style="grid-template-columns:repeat(2,1fr)">
+            <div class="card"><h4>1. Dataset</h4><p>The facts. One indexed dataset per agent. Configure column subsetting and agent filters.</p></div>
+            <div class="card"><h4>2. Supplemental Instructions</h4><p>The brain. Up to 6,000 characters of custom rules using the R.T.C.C.O.E Framework.</p></div>
+            <div class="card"><h4>3. Knowledge Documents</h4><p>The reference library. Up to 10 PDFs/TXTs (5MB each), processed via RAG.</p></div>
+            <div class="card"><h4>4. Welcome Message</h4><p>The introduction. Sets expectations and provides sample questions for users.</p></div>
+        </div>
+
+        <h3>R.T.C.C.O.E Framework</h3>
+        <p style="margin-bottom:14px">Structure your Supplemental Instructions using this 6-component framework:</p>
+        <div class="fw-grid">
+            <div class="fw-card"><div class="letter">R</div><div class="label">Role</div><div class="desc">"You are a Senior Sales Analytics Expert"</div></div>
+            <div class="fw-card"><div class="letter">T</div><div class="label">Task</div><div class="desc">"Answer with charts, highlight anomalies"</div></div>
+            <div class="fw-card"><div class="letter">C</div><div class="label">Context</div><div class="desc">Fiscal calendars, KPI formulas, hierarchies</div></div>
+            <div class="fw-card"><div class="letter">C</div><div class="label">Constraints</div><div class="desc">Default metrics, mandatory filters, no fabrication</div></div>
+            <div class="fw-card"><div class="letter">O</div><div class="label">Output</div><div class="desc">Comparison → Table, Time → Area Chart</div></div>
+            <div class="fw-card"><div class="letter">E</div><div class="label">Examples</div><div class="desc">2-3 query → response pairs anchoring behavior</div></div>
+        </div>
+
+        <details>
+            <summary>Hands-On Lab — Build an Agent (20 min)</summary>
+            <div class="expand-content">
+                <ol>
+                    <li>Navigate to Home &rarr; <strong>Create</strong> &rarr; <strong>AI Agent</strong></li>
+                    <li>Select your indexed dataset and configure column subsetting</li>
+                    <li>Write Supplemental Instructions using R.T.C.C.O.E:
+                        <div class="code"><span class="label">Role:</span>        You are a Sales Analytics Expert for TD Bank.
+
+<span class="label">Task:</span>        Answer questions with accurate visualizations.
+              Provide insight + recommendation.
+
+<span class="label">Context:</span>     Fiscal Year = Nov 1 – Oct 31.
+              Q1 = Nov–Jan, Q2 = Feb–Apr, Q3 = May–Jul, Q4 = Aug–Oct.
+              "current quarter" = FY2026 Q2.
+              KPI: ATV = Sum(Sales_Revenue) / Count Distinct(Order ID).
+              Grouping: Order Priority
+                "Low, Medium, Not Specified" → "Regular"
+                "High, Critical" → "Important"
+
+<span class="label">Constraints:</span> Default metric = Revenue (Sum).
+              Default ranking = Top 5.
+              Never fabricate data.
+
+<span class="label">Output:</span>      Comparisons → Table.
+              Time trends → Area Chart.
+              Always show applied filters.
+
+<span class="label">Examples:</span>    "Revenue this quarter"
+              → Filter Fiscal Quarter = 'FY2026 Q2', metric = Sum(Sales).</div>
+                    </li>
+                    <li>Write a Welcome Message with 3 sample questions</li>
+                    <li>Upload a Knowledge Document (PDF with business context)</li>
+                    <li><strong>Test your agent:</strong>
+                        <ul>
+                            <li><em>"Compare Average Profit for Regular and Important Orders"</em></li>
+                            <li><em>"Show Revenue for Current Quarter"</em></li>
+                            <li><em>"What's our ATV by Customer Segment?"</em></li>
+                            <li><em>"Best 5 Products by Profit"</em></li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
+        </details>
+
+        <div style="margin-top:14px">
+            <a href="https://blogs.oracle.com/analytics/oracle-analytics-cloud-gen-ai-agent" target="_blank" class="ref">📘 Meet Your 24/7 OAC Gen AI Agent</a>
+            <a href="https://blogs.oracle.com/analytics/create-and-configure-oracle-analytics-cloud-ai-agents" target="_blank" class="ref">📘 Create and Configure AI Agents</a>
+        </div>
+
+        <div class="qa-prompt"><strong>Discussion:</strong> What business domains would benefit most from a dedicated agent?</div>
+    </div>
+
+    <!-- ════════ MODULE 5 ════════ -->
+    <div class="section fade-in" id="m5">
+        <div class="section-header">
+            <div class="section-num">5</div>
+            <div class="section-title">AI Functions</div>
+            <div class="section-time">20 + 5 Q&A</div>
+        </div>
+
+        <p>The most valuable insights are often buried in free-text columns — customer comments, reviews, support tickets, agent notes, survey feedback. OAC AI Functions let you analyze these directly in the Expression Editor, no code or ETL required.</p>
+
+        <h3>The Three AI Functions</h3>
+
+        <div class="card" style="margin:14px 0;padding:20px;border-left:4px solid var(--green)">
+            <h4 style="color:var(--green-darker)">AI_FILTER() — Find the Rows That Matter</h4>
+            <p>Filters rows using semantic understanding, not keyword matching.</p>
+            <div class="code">AI_FILTER("Customer Comments", 'complaints about delivery delays or shipping issues')</div>
+        </div>
+
+        <div class="card" style="margin:14px 0;padding:20px;border-left:4px solid var(--blue)">
+            <h4 style="color:var(--blue)">AI_GENERATE() — Classify Each Row</h4>
+            <p>Generates a per-row value by applying an AI prompt to text.</p>
+            <div class="code">AI_GENERATE('Classify as Positive, Negative, or Neutral', "Feedback")</div>
+        </div>
+
+        <div class="card" style="margin:14px 0;padding:20px;border-left:4px solid #1F1F1F">
+            <h4>AI_AGG() — Summarize the Broader Pattern</h4>
+            <p>Aggregates across many rows into a consolidated summary.</p>
+            <div class="code">AI_AGG('Summarize the top 3 recurring themes', "Feedback")</div>
+        </div>
+
+        <details>
+            <summary>Hands-On Walkthrough</summary>
+            <div class="expand-content">
+                <ol>
+                    <li>Open a workbook with text-heavy data (customer comments, reviews, notes)</li>
+                    <li>Navigate to <strong>My Calculations → Add Calculation</strong></li>
+                    <li>Use AI_GENERATE to classify each row</li>
+                    <li>Create a visualization using the classification column (e.g., pie chart of sentiment)</li>
+                    <li>Use AI_FILTER to drill into specific themes</li>
+                    <li>Apply AI_AGG to summarize patterns across groups</li>
+                    <li>Combine with standard OAC filters to slice by region, product, or time</li>
+                </ol>
+            </div>
+        </details>
+
+        <a href="https://github.com/ravi-bhuma/oac-ai-functions" target="_blank" class="ref">📘 GitHub: OAC AI Functions Repository</a>
+
+        <div class="qa-prompt"><strong>Discussion:</strong> Where does your organization have free-text data that rarely makes it into dashboards?</div>
+    </div>
+
+    <!-- ════════ MODULE 6 ════════ -->
+    <div class="section fade-in" id="m6">
+        <div class="section-header">
+            <div class="section-num">6</div>
+            <div class="section-title">OAC MCP Server</div>
+            <div class="section-time">20 + 5 Q&A</div>
+        </div>
+
+        <p>The Model Context Protocol (MCP) Server connects OAC to external AI tools securely — extending governed analytics into Claude Desktop, Cline, GitHub Copilot, n8n, and LangChain.</p>
+
+        <h3>Discover → Describe → Execute</h3>
+        <table class="tbl">
+            <thead><tr><th>Tool</th><th>What It Does</th><th>Example</th></tr></thead>
+            <tbody>
+                <tr><td><strong>Discover</strong></td><td>Lists available datasets and subject areas</td><td><em>"What datasets are available?"</em></td></tr>
+                <tr><td><strong>Describe</strong></td><td>Returns tables, columns, measures, hierarchies</td><td><em>"Describe the Sales dataset"</em></td></tr>
+                <tr><td><strong>Execute</strong></td><td>Runs Logical SQL with full governance (RLS enforced)</td><td><em>"Show revenue by region for 2025"</em></td></tr>
+            </tbody>
+        </table>
+
+        <details>
+            <summary>Setup Walkthrough (5 Steps)</summary>
+            <div class="expand-content">
+                <ol>
+                    <li><strong>Generate Access Tokens:</strong> User Profile → Access Tokens → Download (tokens.json)</li>
+                    <li><strong>Download MCP Connect:</strong> User Profile → MCP Connect → Download → Extract</li>
+                    <li><strong>Install Node.js:</strong> v18+ from nodejs.org</li>
+                    <li><strong>Configure Claude Desktop:</strong> Edit claude_desktop_config.json with OAC MCP server config
+                        <div class="code">{
+  "mcpServers": {
+    "oac-mcp-connect": {
+      "command": "node",
+      "args": ["/path/to/oac-mcp-connect.js",
+               "https://&lt;OAC-INSTANCE&gt;.analytics.ocp.oraclecloud.com"],
+      "description": "OAC MCP Server"
+    }
+  }
+}</div>
+                    </li>
+                    <li><strong>Verify:</strong> Open Claude Desktop → Check 3 tools connected (Discover, Describe, Execute)</li>
+                </ol>
+            </div>
+        </details>
+
+        <div class="callout info"><strong>Security:</strong> OAuth 2.0 authentication, role-based access, row-level security enforced during execution. Data governance maintained at the OAC layer.</div>
+
+        <a href="https://blogs.oracle.com/analytics/oracle-analytics-cloud-mcp-server-bridging-enterprise-analytics-and-ai" target="_blank" class="ref">📘 OAC MCP Server Blog</a>
+
+        <div class="qa-prompt"><strong>Discussion:</strong> What external AI tools could your team benefit from connecting to OAC?</div>
+    </div>
+
+    <!-- ════════ MODULE 7 ════════ -->
+    <div class="section fade-in" id="m7">
+        <div class="section-header">
+            <div class="section-num">7</div>
+            <div class="section-title">Embedding AI Assistant</div>
+            <div class="section-time">10 + 5 Q&A</div>
+        </div>
+
+        <p>Bring analytics directly into business applications. No context switching — users ask questions inside their CRM, HR portal, or custom app using the <code>&lt;oa-assistant&gt;</code> tag.</p>
+
+        <h3>Use Cases</h3>
+        <ul>
+            <li><strong>CRM:</strong> Sales reps check pipeline data without leaving their tool</li>
+            <li><strong>HR Portal:</strong> Managers explore employee analytics inline</li>
+            <li><strong>Supply Chain:</strong> Real-time querying inside operations dashboards</li>
+            <li><strong>Customer Portals:</strong> Self-service analytics for external users</li>
+        </ul>
+
+        <a href="https://github.com/ravi-bhuma/oac-ai-assistant-embedding" target="_blank" class="ref">📘 GitHub: OAC AI Assistant Embedding</a>
+
+        <div class="qa-prompt"><strong>Discussion:</strong> Where would embedding the AI Assistant add the most value in your workflows?</div>
+    </div>
+
+    <!-- ════════ WRAP-UP ════════ -->
+    <div class="section fade-in" id="wrap">
+        <div class="section-header">
+            <div class="section-title">Q&A, Discussion & Wrap-Up</div>
+            <div class="section-time">10 min</div>
+        </div>
+
+        <h3>5 Key Takeaways</h3>
+        <div class="takeaways">
+            <div class="takeaway"><h4>1. Foundation First</h4><p>Dataset preparation (indexing & synonyms) is the foundation for every AI feature.</p></div>
+            <div class="takeaway"><h4>2. Democratize Analytics</h4><p>AI Assistant brings conversational analytics to everyone — no technical skills needed.</p></div>
+            <div class="takeaway"><h4>3. Domain Expertise</h4><p>AI Agents transform generic AI into domain experts via R.T.C.C.O.E framework.</p></div>
+            <div class="takeaway"><h4>4. Text Intelligence</h4><p>AI Functions (AI_FILTER, AI_GENERATE, AI_AGG) make unstructured data analytics-ready.</p></div>
+            <div class="takeaway"><h4>5. Extend Beyond OAC</h4><p>MCP Server and Embedding extend analytics into external AI tools and business apps.</p></div>
+        </div>
+
+        <h3>Resources</h3>
+        <div style="margin:14px 0">
+            <a href="https://ravi-bhuma.github.io/oac-ai-workshops/td.html" target="_blank" class="ref">📘 OAC Prompt Studio — Resource Hub</a>
+            <a href="https://github.com/ravi-bhuma/oac-ai-functions" target="_blank" class="ref">📘 GitHub: OAC AI Functions</a>
+            <a href="https://github.com/ravi-bhuma/oac-ai-assistant-embedding" target="_blank" class="ref">📘 GitHub: AI Assistant Embedding</a>
+        </div>
+        <div style="margin:10px 0">
+            <a href="https://blogs.oracle.com/analytics/the-oracle-analytics-cloud-ai-ecosystem-shaping-the-future-of-enterprise-analytics" target="_blank" class="ref">📘 OAC AI Ecosystem</a>
+            <a href="https://blogs.oracle.com/analytics/oracle-analytics-cloud-mcp-server-bridging-enterprise-analytics-and-ai" target="_blank" class="ref">📘 MCP Server Blog</a>
+            <a href="https://blogs.oracle.com/analytics/oracle-analytics-cloud-all-about-oracle-analytics-ai-assistant" target="_blank" class="ref">📘 All About AI Assistant</a>
+            <a href="https://blogs.oracle.com/analytics/create-and-configure-oracle-analytics-cloud-ai-agents" target="_blank" class="ref">📘 Create AI Agents</a>
+        </div>
+        <div class="callout tip" style="margin-top:20px"><strong>Oracle Analytics Community:</strong> <a href="https://community.oracle.com/products/oracleanalytics" target="_blank" style="color:var(--blue)">community.oracle.com/products/oracleanalytics</a> — Connect with OAC users, share insights, and stay updated.</div>
+    </div>
+
+    <!-- ════════ FOOTER ════════ -->
+    <div class="footer">
+        <div class="footer-inner">
+            <div class="footer-left">
+                <div class="cover-meta-label">Presenters</div>
+                <p><span class="name">Ravi Bhuma</span>, <span class="role">Principal Solutions Architect · Oracle Analytics, CEAL Team</span></p>
+                <p><span class="name">Manpreet Shahi</span>, <span class="role">Senior Director · Oracle Analytics, CEAL Team</span></p>
+                <p><span class="name">Bala Guddeti</span>, <span class="role">Principal Analytics Cloud Solution Technologist, Cloud Engineering</span></p>
+            </div>
+            <div class="footer-right">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Toronto-Dominion_Bank_logo.svg" alt="TD Bank" class="footer-logo">
+                <p>Prepared for TD Bank · April 16, 2026</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Progress bar
+window.addEventListener('scroll',()=>{
+    const h=document.documentElement;
+    const pct=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;
+    document.getElementById('progress').style.width=pct+'%';
+});
+
+// Active nav tracking
+const sections=document.querySelectorAll('.section,.cover');
+const navLinks=document.querySelectorAll('.topbar-nav a');
+const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+        if(e.isIntersecting){
+            navLinks.forEach(a=>a.classList.remove('active'));
+            const id=e.target.id;
+            const link=document.querySelector(`.topbar-nav a[href="#${id}"]`);
+            if(link)link.classList.add('active');
+        }
+    });
+},{threshold:0.3,rootMargin:'-80px 0px -50% 0px'});
+sections.forEach(s=>obs.observe(s));
+
+// Back to Top visibility
+const backTop=document.getElementById('backTop');
+window.addEventListener('scroll',()=>{
+    backTop.classList.toggle('visible',window.scrollY>400);
+});
+
+// Dark mode toggle
+const themeToggle=document.getElementById('themeToggle');
+const themeIcon=document.getElementById('themeIcon');
+function setTheme(dark){
+    document.documentElement.setAttribute('data-theme',dark?'dark':'');
+    themeIcon.textContent=dark?'🌙':'☀️';
+}
+themeToggle.addEventListener('click',()=>{
+    const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+    setTheme(!isDark);
+});
+
+// Fade-in on scroll
+const fadeEls=document.querySelectorAll('.fade-in');
+const fadeObs=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+        if(e.isIntersecting){e.target.classList.add('visible');fadeObs.unobserve(e.target)}
+    });
+},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+fadeEls.forEach(el=>fadeObs.observe(el));
+
+// QR Code generator (lightweight canvas-based)
+(function(){
+    const url='https://ravi-bhuma.github.io/oac-ai-workshops/td.html';
+    const canvas=document.getElementById('qrCanvas');
+    if(!canvas)return;
+    // Use QR API to draw on canvas
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    img.onload=function(){
+        canvas.width=120;canvas.height=120;
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#fff';ctx.fillRect(0,0,120,120);
+        ctx.drawImage(img,0,0,120,120);
+    };
+    img.src='https://api.qrserver.com/v1/create-qr-code/?size=120x120&data='+encodeURIComponent(url)+'&color=003F2D&bgcolor=FFFFFF&format=png';
+})();
+
+// Copy buttons on code blocks
+document.querySelectorAll('.code').forEach(block=>{
+    const wrapper=document.createElement('div');
+    wrapper.className='code-wrapper';
+    block.parentNode.insertBefore(wrapper,block);
+    wrapper.appendChild(block);
+    const btn=document.createElement('button');
+    btn.className='copy-btn';
+    btn.textContent='Copy';
+    btn.addEventListener('click',()=>{
+        const text=block.textContent.replace(/Copy$/,'').trim();
+        navigator.clipboard.writeText(text).then(()=>{
+            btn.textContent='Copied!';
+            btn.classList.add('copied');
+            setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied')},2000);
+        });
+    });
+    wrapper.appendChild(btn);
+});
+</script>
+</body>
+</html>
